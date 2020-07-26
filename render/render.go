@@ -3,11 +3,12 @@ package render
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"reflect"
 	"time"
 
-	"github.com/osteele/liquid/values"
+	"github.com/atulkgupta9/liquid/values"
 )
 
 // Render renders the render tree.
@@ -65,6 +66,9 @@ func (n *ObjectNode) render(w *trimWriter, ctx nodeContext) Error {
 	value, err := ctx.Evaluate(n.expr)
 	if err != nil {
 		return wrapRenderError(err, n)
+	}
+	if value == nil {
+		return wrapRenderError(errors.New("value found nil"), n)
 	}
 	if err := wrapRenderError(writeObject(w, value), n); err != nil {
 		return err
